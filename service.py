@@ -37,6 +37,16 @@ def criar_persona(persona):
 def listar_personas():
     return carregar_personas()
 
+def verificar_personas():
+    personas = carregar_personas()
+    return bool(personas)
+
+def verificar_persona_especifica(persona_id):
+    personas = carregar_personas()
+    for persona in personas:
+        if persona["id"] == persona_id:
+            return True
+    return False
 
 def buscar_persona(persona_id):
     personas = carregar_personas()

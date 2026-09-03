@@ -19,6 +19,16 @@ def atualizar_persona(persona_id: int, persona: dict):
 def listar_personas():
     return service.listar_personas()
 
+@router.head("")
+def verificar_personas():
+    if not service.verificar_personas():
+        raise HTTPException(status_code=404)
+
+@router.head("/{persona_id}")
+def verificar_persona_especifica(persona_id: int):
+    if not service.verificar_persona_especifica(persona_id):
+        raise HTTPException(status_code=404)
+
 @router.get("/{persona_id}")
 def buscar_persona(persona_id: int):
     persona = service.buscar_persona(persona_id)
