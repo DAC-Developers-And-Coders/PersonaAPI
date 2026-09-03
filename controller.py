@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Body
+from email import header
+
+from fastapi import APIRouter, HTTPException, Body, Response
 from typing import Any
 import service
 
@@ -22,12 +24,18 @@ def listar_personas():
 @router.head("")
 def verificar_personas():
     if not service.verificar_personas():
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, headers={"mensagem": "nenhuma persona encontrada"})
+    return Response(status_code=200, headers={"mensagem": "personas encontradas"})
+
+@router.options("")
+def verificar_opcoes():
+    return Response(status_code=204, headers={"Permite": "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS"})
 
 @router.head("/{persona_id}")
 def verificar_persona_especifica(persona_id: int):
     if not service.verificar_persona_especifica(persona_id):
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, headers={"mensagem": "persona não encontrada"})
+    return Response(status_code=200, headers={"mensagem": "persona encontrada"})
 
 @router.get("/{persona_id}")
 def buscar_persona(persona_id: int):
