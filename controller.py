@@ -1,38 +1,43 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
+from typing import Any
 import service
 
-router = APIRouter(prefix="/usuarios", tags=["Usuários"])
-
+router = APIRouter(prefix="/personas", tags=["Personas"])
 
 @router.post("")
-def criar_usuario(usuario: dict):
-    return service.criar_usuario(usuario)
+def criar_persona(persona: dict):
+    return service.criar_persona(persona)
 
-
-@router.put("/{usuario_id}")
-def atualizar_usuario(usuario_id: int, usuario: dict):
-    resultado = service.atualizar_usuario(usuario_id, usuario)
+@router.put("/{persona_id}")
+def atualizar_persona(persona_id: int, persona: dict):
+    resultado = service.atualizar_persona(persona_id, persona)
     if resultado is None:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        raise HTTPException(status_code=404, detail="Persona não encontrada")
     return resultado
 
-
 @router.get("")
-def listar_usuarios():
-    return service.listar_usuarios()
+def listar_personas():
+    return service.listar_personas()
 
+@router.get("/{persona_id}")
+def buscar_persona(persona_id: int):
+    persona = service.buscar_persona(persona_id)
+    if persona is None:
+        raise HTTPException(status_code=404, detail="Persona não encontrada")
+    return persona
 
-@router.get("/{usuario_id}")
-def buscar_usuario(usuario_id: int):
-    usuario = service.buscar_usuario(usuario_id)
-    if usuario is None:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    return usuario
-
-
-@router.delete("/{usuario_id}")
-def excluir_usuario(usuario_id: int):
-    resultado = service.excluir_usuario(usuario_id)
+@router.delete("/{persona_id}")
+def excluir_persona(persona_id: int):
+    resultado = service.excluir_persona(persona_id)
     if not resultado:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
-    return {"mensagem": "Usuário excluído com sucesso"}
+        raise HTTPException(status_code=404, detail="Persona não encontrada")
+    return {"mensagem": "Persona excluída com sucesso"}
+
+@router.patch("/{persona_id}/{attribute}")
+def atualizar_atributo(persona_id: int, attribute: str, valor: Any = Body(...)):
+    resultado = service.atualizar_atributo(persona_id, attribute, valor)
+    if resultado is None:
+        raise HTTPException(status_code=404, detail="Persona não encontrada")
+    elif resultado == "Erro de atributo":
+        raise HTTPException(status_code=404, detail="Atributo não encontrado")
+    return resultado

@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "nome": "Matador",
+        "origem": "toureiros",
+        "arcanas": [
+            "Força",
+            "Morte"
+        ]
+    },
+    {
+        "id": 2,
+        "nome": "Jack Frost",
+        "origem": "Mitologia Inglesa",
+        "arcanas": [
+            "Amantes",
+            "Mago"
+        ]
+    },
+    {
+        "id": 3,
+        "nome": "Succubus",
+        "origem": "Mitologia Europeia",
+        "arcanas": [
+            "Lua",
+            "Diabo"
+        ]
+    }
+]
