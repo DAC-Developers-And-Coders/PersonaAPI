@@ -5,18 +5,15 @@ from Model.Persona import Persona
 
 ARQUIVO = "personas.json"
 
-
 def carregar_personas():
     if not os.path.exists(ARQUIVO):
         return []
     with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
         return json.load(arquivo)
 
-
 def salvar_personas(personas):
     with open(ARQUIVO, "w", encoding="utf-8") as arquivo:
         json.dump(personas, arquivo, ensure_ascii=False, indent=4)
-
 
 def criar_persona(persona):
     personas = carregar_personas()
@@ -32,7 +29,6 @@ def criar_persona(persona):
     personas.append(novo_persona)
     salvar_personas(personas)
     return novo_persona
-
 
 def listar_personas():
     return carregar_personas()
@@ -54,7 +50,6 @@ def buscar_persona(persona_id):
         if persona["id"] == persona_id:
             return persona
     return None
-
 
 def atualizar_persona(persona_id, dados):
     personas = carregar_personas()
@@ -83,7 +78,6 @@ def atualizar_atributo(persona_id, atributo, valor):
             return persona
 
     return None
-
 
 def excluir_persona(persona_id):
     personas = carregar_personas()
