@@ -4,8 +4,7 @@
         "nome": "Matador",
         "origem": "toureiros",
         "arcanas": [
-            "Força",
-            "Morte"
+            "Força"
         ]
     },
     {
@@ -13,8 +12,7 @@
         "nome": "Jack Frost",
         "origem": "Mitologia Inglesa",
         "arcanas": [
-            "Amantes",
-            "Mago"
+            "Amantes"
         ]
     },
     {
@@ -22,8 +20,7 @@
         "nome": "Succubus",
         "origem": "Mitologia Europeia",
         "arcanas": [
-            "Lua",
-            "Diabo"
+            "Lua"
         ]
     }
 ]
