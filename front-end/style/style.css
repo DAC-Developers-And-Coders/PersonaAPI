@@ -1,0 +1,123 @@
+@font-face {
+    font-family: Persona5-Menu;
+    src: url(../fonts/Persona5MenuFontPrototype-Regular.ttf);
+}
+
+@font-face {
+    font-family: p5hatty;
+    src: url(../fonts/p5hatty-1.ttf);
+}
+
+@font-face {
+    font-family: Optima-Nova-LT-Black;
+    src: url(../fonts/Optima\ nova\ LT\ Black\ Regular.otf);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --red: #E60012;
+    --red-dark: #A8000D;
+    --red-light: #FF2638;
+
+    --black: #0D0D0F;
+    --black-soft: #17171A;
+
+    --white: #F5F5F5;
+    --white-muted: #DCDCDC;
+
+    --gold: #D6A928;
+    --gold-light: #F2D46F;
+    --gold-dark: #96751A;
+
+    --gray: #777777;
+    --gray-dark: #303035;
+
+    --special-font: Persona5-Menu;
+    --common-font: Optima-Nova-LT-Black;
+    --bold-font: p5hatty;
+
+    --font-sm: 1.25rem;
+    --sizing-sm: 1rem;
+    --sizing-md: 1.5rem;
+    --sizing-lg: 2rem;
+    --sizing-xl: 3rem;
+    --sizing-xxl: 4rem;
+    --sizing-xxxl: 5rem;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--red);
+}
+
+section {
+    height: 100vh;
+}
+
+header {
+    font-family: var(--special-font);
+    background-color: var(--black);
+    color: var(--white);
+    
+    height: 10vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: var(--sizing-lg);
+
+    position: sticky;
+    z-index: 1000;
+    top: 0;
+}
+
+header h1 {
+    font-size: var(--sizing-xl);
+    font-weight: normal;
+    transition: .4s;
+}
+
+header h1 a {
+    text-decoration: none;
+    color: var(--white);
+    transition: .4s;
+}
+
+header h1:hover {
+    scale: 1.1;
+}
+
+header a:hover {
+    color: var(--gold-light);
+}
+
+.nav-header-menu {
+    font-family: var(--bold-font);
+    display: flex;
+    list-style: none;
+    align-items: center;
+    gap: var(--sizing-md);
+    padding: var(--sizing-md);
+    font-size: var(--sizing-lg);
+}
+
+.nav-header-menu li{
+    transition: .4s;
+}
+
+.nav-header-menu li:hover {
+    scale: 1.1;
+}
+
+.nav-header-menu a {
+    color: var(--white);
+    text-decoration: none;
+    transition: .4s;
+}
