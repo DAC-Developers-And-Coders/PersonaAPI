@@ -1,61 +1,49 @@
-from email import header
-
-from fastapi import APIRouter, HTTPException, Body, Response
+from Model.Persona import Persona, PersonaCreate
 from typing import Any
 import service
 
-router = APIRouter(prefix="/personas", tags=["Personas"])
-
-@router.post("")
-def criar_persona(persona: dict):
+def criar_persona(persona: PersonaCreate):
     return service.criar_persona(persona)
 
-@router.put("/{persona_id}")
-def atualizar_persona(persona_id: int, persona: dict):
-    resultado = service.atualizar_persona(persona_id, persona)
-    if resultado is None:
-        raise HTTPException(status_code=404, detail="Persona não encontrada")
-    return resultado
+def atualizar_persona(persona_id: int, persona: PersonaCreate):
+    return service.atualizar_persona(persona_id, persona)
 
-@router.get("")
 def listar_personas():
     return service.listar_personas()
 
-@router.head("")
-def verificar_personas():
-    if not service.verificar_personas():
-        raise HTTPException(status_code=404, headers={"mensagem": "nenhuma persona encontrada"})
-    return Response(status_code=200, headers={"mensagem": "personas encontradas"})
+def listar_elementos():
+    return service.listar_elementos()
 
-@router.options("")
-def verificar_opcoes():
-    return Response(status_code=204, headers={"Permite": "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS"})
+def listar_arcanas():
+    return service.listar_arcanas()
 
-@router.head("/{persona_id}")
-def verificar_persona_especifica(persona_id: int):
-    if not service.verificar_persona_especifica(persona_id):
-        raise HTTPException(status_code=404, headers={"mensagem": "persona não encontrada"})
-    return Response(status_code=200, headers={"mensagem": "persona encontrada"})
+def verificar_tabelas(table_name: str):
+    return service.verificar_tabela(table_name)
 
-@router.get("/{persona_id}")
-def buscar_persona(persona_id: int):
-    persona = service.buscar_persona(persona_id)
-    if persona is None:
-        raise HTTPException(status_code=404, detail="Persona não encontrada")
-    return persona
+def verificar_opcoes_personas():
+    return {"Allow": "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS"}
 
-@router.delete("/{persona_id}")
+def verificar_opcoes_gerais():
+    return {"Allow": "GET, HEAD, OPTIONS"}
+
+def verificar_dado_especifico(nome_tabela: str, dado_id: int):
+    return service.verificar_dado_especifico(nome_tabela, dado_id)
+
+def buscar_dado(nome_tabela: str, persona_id: int):
+    return service.buscar_dado(nome_tabela, persona_id)
+
 def excluir_persona(persona_id: int):
-    resultado = service.excluir_persona(persona_id)
-    if not resultado:
-        raise HTTPException(status_code=404, detail="Persona não encontrada")
-    return {"mensagem": "Persona excluída com sucesso"}
+    return service.excluir_persona(persona_id)
 
-@router.patch("/{persona_id}/{attribute}")
-def atualizar_atributo(persona_id: int, attribute: str, valor: Any = Body(...)):
+def atualizar_atributo(persona_id: int, attribute: str, valor: Any):
     resultado = service.atualizar_atributo(persona_id, attribute, valor)
+
     if resultado is None:
-        raise HTTPException(status_code=404, detail="Persona não encontrada")
+        return None
     elif resultado == "Erro de atributo":
-        raise HTTPException(status_code=404, detail="Atributo não encontrado")
+        return 404
+    elif resultado == "Erro de acesso":
+        return 403
+    elif resultado == "Erro de tipo":
+        return 422
     return resultado

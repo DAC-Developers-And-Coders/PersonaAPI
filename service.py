@@ -1,131 +1,87 @@
-import sqlite3
-from Model.Persona import Persona
+from Model.Arcana import Arcana
+from Model.Elemento import Elemento
+from Model.Database import Database as Db
+from Model.Persona import Persona, PersonaGet
+from pydantic import TypeAdapter, ValidationError
 
-BANCO = "personadb.db"
-
-def conecta_banco():
-    conn = sqlite3.connect(BANCO)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def inicializa_banco():
-    conn = conecta_banco()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS personas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            origem TEXT,
-            arcanas TEXT
-            )
-        '''
-    )
-    conn.commit()
-    conn.close()
-
-inicializa_banco()
+database = Db()
+database.initialize_database()
 
 def criar_persona(persona):
-    conn = conecta_banco()
-    cursor = conn.cursor()
+    nova_persona = persona.model_dump()
+    persona_id = database.insert_data('Persona', nova_persona)
 
-    cursor.execute(
-        "INSERT INTO personas (nome, origem, arcanas) VALUES (?, ?, ?)",
-        (persona["nome"], persona["origem"], persona["arcanas"])
-    )
-    conn.commit()
-
-    novo_id = cursor.lastrowid
-    conn.close()
-
-    return {
-        "id": novo_id,
-        "nome": persona["nome"],
-        "origem": persona["origem"],
-        "arcanas": persona["arcanas"]
-    }
-
-
-
+    return Persona(id=persona_id, **nova_persona)
 
 def listar_personas():
-    conn = conecta_banco()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM personas")
-    linhas = conn.fetchall()
-    conn.close()
+    resultado = database.get_all_data('Persona')
+    return [PersonaGet(**persona) for persona in resultado]
 
-    return[dict(linha) for linha in linhas]
+def listar_elementos():
+    resultado = database.get_all_data('Elemento')
+    return [Elemento(**elemento) for elemento in resultado]
 
-def verificar_personas():
-    conn = conecta_banco()
-    cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM personas LIMIT 1 ")
-    resultado = cursor.fetchone()
-    conn.close()
+def listar_arcanas():
+    resultado = database.get_all_data('Arcana')
+    return [Arcana(**arcana) for arcana in resultado]
 
-    return bool(resultado)
+def buscar_dado(nome_tabela, dado_id):
+    resultado = database.get_specific_data(nome_tabela, 'id', dado_id)
 
-def buscar_persona(persona_id):
-    conn = conecta_banco()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM personas WHERE id = ?", (persona_id,))
-    linha = cursor.fetchone()
-    conn.close
+    if not resultado:
+        return None
 
-    return dict(linha) if linha else None
-    
-def verificar_persona_especifica(persona_id):
-    return buscar_persona(persona_id) is not None
+    if nome_tabela == 'Persona':
+        return PersonaGet(**resultado)
+    elif nome_tabela == 'Elemento':
+        return Elemento(**resultado)
+    elif nome_tabela == 'Arcana':
+        return Arcana(**resultado)
+    return None
+
+def atualizar_persona(persona_id, persona):
+    persona_atual = buscar_dado('Persona', persona_id)
+
+    if not persona_atual:
+        return None
+
+    persona_atualizada = persona.model_dump()
+
+    database.update_data('Persona', persona_atualizada, persona_id)
+
+    return Persona(id=persona_id, **persona_atualizada)
 
 def excluir_persona(persona_id):
-    if not verificar_persona_especifica(persona_id):
+    if not verificar_dado_especifico('Persona', persona_id):
         return False
 
-    conn = conecta_banco()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM personas WHERE id = ?", (persona_id,))
-    conn.commit()
-    conn.close
+    database.delete_data('Persona', persona_id)
     return True
 
-def atualizar_persona(persona_id, dados):
-    persona_atual = buscar_persona(persona_id)
-    if not persona_atual:
+def atualizar_atributo(persona_id, atributo, valor):
+    if not verificar_dado_especifico('Persona', persona_id):
         return None
-    
-    nome = dados.get("nome", persona_atual["nome"])
-    origem = dados.get("origem", persona_atual["origem"])
-    arcanas  = dados.get("arcanas", persona_atual["arcanas "])
 
-    conn = conecta_banco()
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE personas SET nome = ?, origem = ?, arcanas = ? WHERE id = ?",
-        (nome, origem, arcanas, persona_id)
-    )
-
-    conn.commit()
-    conn.close()
-    
-    return {"id": persona_id, "nome": nome, "origem": origem, "arcanas": arcanas}
-
-
-
-def atualizar_atributo(persona_id, atributo,  dados):
-    atributos_permitidos = ["nome", "origem", "arcanas"]
-    if atributo not in atributos_permitidos:
+    if atributo not in Persona.model_fields:
         return "Erro de atributo"
+    elif atributo == 'id':
+        return "Erro de acesso"
 
-    persona_atual = buscar_persona(persona_id)
-    if not persona_atual:
-        return None
-    
-    conn = conectar()
-    cursor = conn.cursor()
-    cursor.execute(f"UPDATE personas SET {atributo} = ? WHERE id = ?", (valor, persona_id))
-    conn.commit()
-    conn.close()
+    campo = Persona.model_fields[atributo]
 
-    persona_atual[atributo] = valor
-    return persona_atual
+    try:
+        valor_validado = TypeAdapter(campo.annotation).validate_python(valor, strict=True)
+    except ValidationError:
+        return "Erro de tipo"
+
+    database.update_specific_attribute('Persona', atributo, valor_validado, persona_id)
+
+    return buscar_dado('Persona', persona_id)
+
+def verificar_tabela(table_name):
+    resultado = database.verify_table_data(table_name)
+    return bool(resultado)
+
+def verificar_dado_especifico(table_name, element_id):
+    resultado = database.verify_specific_value(table_name, element_id)
+    return bool(resultado)
