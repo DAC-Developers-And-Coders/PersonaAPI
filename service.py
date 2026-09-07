@@ -1,91 +1,87 @@
-import json
-import os
+from Model.Arcana import Arcana
+from Model.Elemento import Elemento
+from Model.Database import Database as Db
+from Model.Persona import Persona, PersonaGet
+from pydantic import TypeAdapter, ValidationError
 
-from Model.Persona import Persona
-
-ARQUIVO = "personas.json"
-
-def carregar_personas():
-    if not os.path.exists(ARQUIVO):
-        return []
-    with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
-        return json.load(arquivo)
-
-def salvar_personas(personas):
-    with open(ARQUIVO, "w", encoding="utf-8") as arquivo:
-        json.dump(personas, arquivo, ensure_ascii=False, indent=4)
+database = Db()
+database.initialize_database()
 
 def criar_persona(persona):
-    personas = carregar_personas()
-    novo_id = max((u["id"] for u in personas), default=0) + 1
+    nova_persona = persona.model_dump()
+    persona_id = database.insert_data('Persona', nova_persona)
 
-    novo_persona = {
-        "id": novo_id,
-        "nome": persona["nome"],
-        "origem": persona["origem"],
-        "arcanas": persona["arcanas"]
-    }
-
-    personas.append(novo_persona)
-    salvar_personas(personas)
-    return novo_persona
+    return Persona(id=persona_id, **nova_persona)
 
 def listar_personas():
-    return carregar_personas()
+    resultado = database.get_all_data('Persona')
+    return [PersonaGet(**persona) for persona in resultado]
 
-def verificar_personas():
-    personas = carregar_personas()
-    return bool(personas)
+def listar_elementos():
+    resultado = database.get_all_data('Elemento')
+    return [Elemento(**elemento) for elemento in resultado]
 
-def verificar_persona_especifica(persona_id):
-    personas = carregar_personas()
-    for persona in personas:
-        if persona["id"] == persona_id:
-            return True
-    return False
+def listar_arcanas():
+    resultado = database.get_all_data('Arcana')
+    return [Arcana(**arcana) for arcana in resultado]
 
-def buscar_persona(persona_id):
-    personas = carregar_personas()
-    for persona in personas:
-        if persona["id"] == persona_id:
-            return persona
+def buscar_dado(nome_tabela, dado_id):
+    resultado = database.get_specific_data(nome_tabela, 'id', dado_id)
+
+    if not resultado:
+        return None
+
+    if nome_tabela == 'Persona':
+        return PersonaGet(**resultado)
+    elif nome_tabela == 'Elemento':
+        return Elemento(**resultado)
+    elif nome_tabela == 'Arcana':
+        return Arcana(**resultado)
     return None
 
-def atualizar_persona(persona_id, dados):
-    personas = carregar_personas()
+def atualizar_persona(persona_id, persona):
+    persona_atual = buscar_dado('Persona', persona_id)
 
-    for persona in personas:
-        if persona["id"] == persona_id:
-            persona["nome"] = dados.get("nome", persona["nome"])
-            persona["origem"] = dados.get("origem", persona["origem"])
-            persona["arcanas"] = dados.get("arcanas", persona["arcanas"])
-            salvar_personas(personas)
-            return persona
+    if not persona_atual:
+        return None
 
-    return None
+    persona_atualizada = persona.model_dump()
 
-def atualizar_atributo(persona_id, atributo, valor):
-    personas = carregar_personas()
+    database.update_data('Persona', persona_atualizada, persona_id)
 
-    for persona in personas:
-        if persona["id"] == persona_id:
-
-            if atributo not in persona:
-                return "Erro de atributo"
-
-            persona[atributo] = valor
-            salvar_personas(personas)
-            return persona
-
-    return None
+    return Persona(id=persona_id, **persona_atualizada)
 
 def excluir_persona(persona_id):
-    personas = carregar_personas()
+    if not verificar_dado_especifico('Persona', persona_id):
+        return False
 
-    for persona in personas:
-        if persona["id"] == persona_id:
-            personas.remove(persona)
-            salvar_personas(personas)
-            return True
+    database.delete_data('Persona', persona_id)
+    return True
 
-    return False
+def atualizar_atributo(persona_id, atributo, valor):
+    if not verificar_dado_especifico('Persona', persona_id):
+        return None
+
+    if atributo not in Persona.model_fields:
+        return "Erro de atributo"
+    elif atributo == 'id':
+        return "Erro de acesso"
+
+    campo = Persona.model_fields[atributo]
+
+    try:
+        valor_validado = TypeAdapter(campo.annotation).validate_python(valor, strict=True)
+    except ValidationError:
+        return "Erro de tipo"
+
+    database.update_specific_attribute('Persona', atributo, valor_validado, persona_id)
+
+    return buscar_dado('Persona', persona_id)
+
+def verificar_tabela(table_name):
+    resultado = database.verify_table_data(table_name)
+    return bool(resultado)
+
+def verificar_dado_especifico(table_name, element_id):
+    resultado = database.verify_specific_value(table_name, element_id)
+    return bool(resultado)
