@@ -23,63 +23,77 @@
         <div class="form-persona">
             <div class="cadaster-persona">
                 <h1>Cadastro de Persona</h1>
-                <form>
+                <form id="create-persona-form">
+                    <input type="text" name="id" placeholder="ID (Apenas para atualizar)">
                     <input type="text" name="name" placeholder="Nome do Persona">
                     <input type="text" name="origem" placeholder="Origem do Persona">
                     <input type="text" name="primeira_aparicao" placeholder="Primeira Aparição do Persona">
-                    <input type="text" name="classe" placeholder="Classe do Persona">
-                    <input type="number" name="nivel_inicial" placeholder="Nível Inicial do Persona">
-                    <input type="number" name="arcana_id" placeholder="Arcana do Persona">
-                    <input type="number" name="elemento_id" placeholder="Elemento do Persona">
-                    <button type="submit">Cadastrar Persona</button>
+                    <input type="text" name="classe" placeholder="Classe do Persona (Opcional)">
+                    <input type="number" name="nivel_inicial" min="1" placeholder="Nível Inicial do Persona">
+                    <input type="number" name="arcana_id" min="0" step="1" placeholder="ID Arcana do Persona">
+                    <input type="number" name="elemento_id" min="1" placeholder="ID Elemento do Persona">
+
+                    <button type="submit" data-action="create">Cadastrar Persona</button>
+                    <button type="submit" data-action="update">Atualizar Persona</button>
+                    <button type="submit" data-action="update-patch" class="column-2">Atualizar Atributo</button>
                 </form>
             </div>
+
             <div class="search-persona">
                 <h1>Buscar Persona</h1>
-                <form>
-                    <input type="number" name="id_persona" placeholder="ID do Persona">
-                    <button type="submit">Buscar Persona</button>
+                <form id="search-persona-form">
+                    <input type="number" name="id_persona" min="1" placeholder="ID do Persona">
+
+                    <button type="submit" data-action="search">Buscar Persona</button>
+                    <button type="submit" data-action="verify">Verificar Persona(s)</button>
+                    <button type="submit" data-action="list">Listar Personas</button>
                 </form>
             </div>
+            
             <div class="delete-persona">
                 <h1>Deletar Persona</h1>
-                <form>
-                    <input type="number" name="id_persona" placeholder="ID do Persona">
+                <form id="delete-persona-form">
+                    <input type="number" name="id_persona" min="1" placeholder="ID do Persona">
+
                     <button type="submit">Deletar Persona</button>
                 </form>
             </div>
-        </div>
-        <div class="result-persona">
 
+            <button type="submit" data-action="verify-options" id="options">Verificar Opções</button>
         </div>
+        <div class="result result-persona"></div>
     </section>
 
     <section id="Elementos">
         <div class="search-elemento">
-            <h1>Buscar Elemento</h1>
-            <form>
-                <input type="number" name="id_elemento" placeholder="ID do Elemento">
-                <button type="submit">Buscar Elemento</button>
+            <h1>Buscar Elementos</h1>
+            <form id="elements-form">
+                <input type="number" min="1" name="id_elemento" placeholder="ID do Elemento">
+
+                <button type="submit" data-action="search">Buscar Elemento</button>
+                <button type="submit" data-action="verify">Verificar Elemento(s)</button>
+                <button type="submit" data-action="list">Listar Elementos</button>
+                <button type="submit" data-action="verify-options">Verificar Opções</button>
             </form>
         </div>
 
-        <div class="result-elemento">
-
-        </div>
+        <div class="result result-elemento"></div>
     </section>
     
     <section id="Arcanas">
         <div class="search-arcano">
-            <h1>Buscar Arcana</h1>
-            <form>
-                <input type="number" name="id_arcano" placeholder="ID do Arcana">
-                <button type="submit">Buscar Arcana</button>
+            <h1>Buscar Arcanas</h1>
+            <form id="arcana-form">
+                <input type="number" name="id_arcano" min="0" placeholder="ID do Arcana">
+
+                <button type="submit" data-action="search">Buscar Arcana</button>
+                <button type="submit" data-action="verify">Verificar Arcana(s)</button>
+                <button type="submit" data-action="list">Listar Arcanas</button>
+                <button type="submit" data-action="verify-options">Verificar Opções</button>
             </form>
         </div>
 
-        <div class="result-arcano">
-
-        </div>
+        <div class="result result-arcano"></div>
     </section>
 
     <script src="./script/script.js"></script>

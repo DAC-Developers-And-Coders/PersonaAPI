@@ -1,7 +1,7 @@
 const API_URL = 'http://localhost:8000/';
 
 const createPersona = (personaName, personaOrigin, firstAppearance, personaClass, initialLevel, arcana_id, element_id) => {
-    if (!personaName || !personaOrigin || !firstAppearance || !initialLevel || arcana_id === null || !element_id) {
+    if (!personaName || !personaOrigin || !firstAppearance || !initialLevel || arcana_id === null || arcana_id === '' || !element_id) {
         throw new Error('Todos os campos, exceto a classe, são obrigatórios para criar uma persona.');
     }
 
@@ -32,6 +32,11 @@ const request = async (endpoint, requestOptions) => {
     try {
         const response = await fetch(`${API_URL}${endpoint}`, requestOptions);
         if (!response.ok) {
+            if (requestOptions?.method === 'HEAD') {
+                const message = response.headers.get('mensagem');
+                throw new Error(`${message}: ${response.status}`);
+            }
+
             const errorData = await response.json();
 
             throw new Error(`${errorData.detail}: ${response.status}`);
@@ -46,6 +51,7 @@ const request = async (endpoint, requestOptions) => {
         return await response.json();
     } catch (error) {
         console.error(error);
+        throw error;
     }
 };
 
@@ -183,52 +189,224 @@ const verifyArcanasOptions = async () => {
     return await request(`arcanas`, requestOptions);
 }
 
-const main = async () => {
-    const personas = await getAllPersonas();
-    const persona = await getSpecificPersona(9);
-    //const newPersona = createPersona("Shiki-Ouji", "Mitologia Japonesa", "Shin Megami Tensei: Devil Summoner", null, 18, 0, 7);
-    //const addedPersona = await addPersona(newPersona);
-    //const deletePersonaResponse = await deletePersona(23);
-    //const updatePersonaData = await updatePersona(20, newPersona)
-    //const updatePersonaAttributeResponse = await updatePersonaAttribute(20, "origem", "Mitologia Chinesa");
-    const verifySpecificPersonaResponse = await verifySpecificPersona(20);
-    const verifyPersonaResponse = await verifyPersona();
-    const verifyPersonaOptionsResponse = await verifyPersonaOptions();
+const showResult = (element, message) => {
+    element.textContent = message;
+}
 
-    const elements = await getAllElements();
-    const element = await getSpecificElement(9);
-    const verifySpecificElementResponse = await verifySpecificElements(3);
-    const verifyElementsResponse = await verifyElements();
-    const verifyElementsOptionsResponse = await verifyElementsOptions();
+const personaResult = document.querySelector('.result-persona');
+const elementsResult = document.querySelector('.result-elemento');
+const arcanasResult = document.querySelector('.result-arcano');
 
-    const arcanas = await getAllArcanas();
-    const arcana = await getSpecificArcana(0);
-    const verifySpecificArcanaResponse = await verifySpecificArcana(3);
-    const verifyArcanasResponse = await verifyArcanas();
-    const verifyArcanasOptionsResponse = await verifyArcanasOptions();
+const createPersonaForm = document.querySelector('#create-persona-form');
+const searchPersonaForm = document.querySelector('#search-persona-form');
+const deletePersonaForm = document.querySelector('#delete-persona-form');
+const optionsButton = document.querySelector('#options');
 
-    console.log(personas);
-    console.log(persona);
-    console.log(verifySpecificPersonaResponse);
-    console.log(verifyPersonaResponse);
-    console.log(verifyPersonaOptionsResponse);
+const elementsForm = document.querySelector('#elements-form');
+const arcanaForm = document.querySelector('#arcana-form');
 
-    console.log(elements);
-    console.log(element);
-    console.log(verifySpecificElementResponse);
-    console.log(verifyElementsResponse);
-    console.log(verifyElementsOptionsResponse);
+createPersonaForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-    console.log(arcanas);
-    console.log(arcana);
-    console.log(verifySpecificArcanaResponse);
-    console.log(verifyArcanasResponse);
-    console.log(verifyArcanasOptionsResponse);
-    
-    //console.log(addedPersona);
-    //console.log(deletePersonaResponse);
-    //console.log(updatePersonaData);
-    //console.log(updatePersonaAttributeResponse);
-};
+    const action = event.submitter.getAttribute('data-action');
+    const formData = new FormData(createPersonaForm);
 
-main();
+    try {
+        const personaName = formData.get('name').trim();
+        const personaOrigin = formData.get('origem').trim();
+        const firstAppearance = formData.get('primeira_aparicao').trim();
+        const personaClass = formData.get('classe').trim();
+
+        const initialLevel = Number(formData.get('nivel_inicial').trim());
+        const arcana_id = parseInt(formData.get('arcana_id').trim());
+        const element_id = parseInt(formData.get('elemento_id').trim());
+
+        if (action === 'create'){
+            const newPersona = createPersona(personaName, personaOrigin, firstAppearance, personaClass, initialLevel, arcana_id, element_id);
+
+            const result = await addPersona(newPersona);
+            showResult(personaResult, `Persona ${result.nome} adicionada com sucesso! ID: ${result.id}`);
+        } else if (action === 'update') {
+            const personaId = parseInt(formData.get('id').trim());
+
+            const updatedPersona = createPersona(personaName, personaOrigin, firstAppearance, personaClass, initialLevel, arcana_id, element_id);
+
+            const result = await updatePersona(personaId, updatedPersona);
+            showResult(personaResult, `Persona ${result.nome} atualizada com sucesso! ID: ${result.id}`);
+        } else if (action === 'update-patch') {
+            const personaId = parseInt(formData.get('id').trim());
+
+            const fields = {
+                nome: formData.get('name').trim(),
+                origem: formData.get('origem').trim(),
+                primeira_aparicao: formData.get('primeira_aparicao').trim(),
+                classe: formData.get('classe').trim(),
+                nivel_inicial: formData.get('nivel_inicial'),
+                arcana_id: formData.get('arcana_id'),
+                elemento_id: formData.get('elemento_id')
+            };
+
+            for (const [attribute, value] of Object.entries(fields)) {
+                if (value !== '') {
+                    let convertedValue = value;
+
+                    if (attribute === 'nivel_inicial' ||
+                        attribute === 'arcana_id' ||
+                        attribute === 'elemento_id') {
+                        convertedValue = Number(value);
+                    }
+
+                    const result = await updatePersonaAttribute(personaId, attribute, convertedValue.trim());
+                }
+            }
+
+            showResult(personaResult, `Persona ID ${personaId} atualizada com sucesso!`);
+        }
+    } catch (error) {
+        showResult(personaResult, `Erro: ${error.message}`);
+    }
+});
+
+searchPersonaForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const action = event.submitter.getAttribute('data-action');
+    const formData = new FormData(searchPersonaForm);
+
+    try {
+        const personaId = parseInt(formData.get('id_persona').trim());
+
+        if (action === 'search') {
+            const result = await getSpecificPersona(personaId);
+            let resultString = `Persona encontrada: ${result.nome} (ID: ${result.id})\nOrigem: ${result.origem}\nPrimeira Aparição: ${result.primeira_aparicao}\nClasse: ${result.classe}\nNível Inicial: ${result.nivel_inicial}\nArcana: ${result.nome_arcana}\nElemento ID: ${result.nome_elemento}`;
+
+            if (!result.classe) {
+                resultString = `Persona encontrada: ${result.nome} (ID: ${result.id})\nOrigem: ${result.origem}\nPrimeira Aparição: ${result.primeira_aparicao}\nNível Inicial: ${result.nivel_inicial}\nArcana: ${result.nome_arcana}\nElemento ID: ${result.nome_elemento}`;
+            }
+
+            showResult(personaResult, resultString);
+        } else if  (action === 'list') {
+            const result = await getAllPersonas();
+            let resultString = 'Lista de Personas:\n';
+
+            result.forEach((persona) => {
+                resultString += `- ${persona.nome} (ID: ${persona.id}) - ${persona.nome_arcana}\n`;
+            });
+
+            showResult(personaResult, resultString);
+        } else if (action === 'verify') {
+            if (personaId) {
+                const result = await verifySpecificPersona(personaId);
+                showResult(personaResult, `Verificação de Persona ID ${personaId}: ${result}`);
+            } else {
+                const result = await verifyPersona();
+                showResult(personaResult, `Verificação de Personas: ${result}`);
+            }
+        }
+    } catch (error) {
+        showResult(personaResult, `Erro: ${error.message}`);
+    }
+});
+
+deletePersonaForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(deletePersonaForm);
+
+    try {
+        const personaId = parseInt(formData.get('id_persona').trim());
+
+        const result = await deletePersona(personaId);
+        showResult(personaResult, `${result}`);
+    } catch (error) {
+        showResult(personaResult, `Erro: ${error.message}`);
+    }
+});
+
+optionsButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    try {
+        const result = await verifyPersonaOptions();
+        showResult(personaResult, result)
+    } catch (error)
+    {
+        showResult(personaResult, `Erro: ${error.message}`);
+    }
+});
+
+elementsForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const action = event.submitter.getAttribute('data-action');
+    const formData = new FormData(elementsForm);
+
+    try {
+        const elementId = parseInt(formData.get('id_elemento').trim());
+
+        if(action === 'search') {
+            const result = await getSpecificElement(elementId);
+            showResult(elementsResult, `Elemento encontrado: ${result.nome} (ID: ${result.id})`);
+        } else if (action === 'list') {
+            const result = await getAllElements();
+            let resultString = 'Lista de Elementos:\n';
+
+            result.forEach((element) => {
+                resultString += `- ${element.nome} (ID: ${element.id})\n`;
+            });
+
+            showResult(elementsResult, resultString);
+        } else if (action === 'verify-options') {
+            const result = await verifyElementsOptions();
+            showResult(elementsResult, result)
+        } else if (action === 'verify') {
+            if (elementId) {
+                const result = await verifySpecificElements(elementId);
+                showResult(elementsResult, `Verificação de Elemento ID ${elementId}: ${result}`);
+            } else {
+                const result = await verifyElements();
+                showResult(elementsResult, `Verificação de Elementos: ${result}`);
+            }
+        }
+    } catch (error) {
+        showResult(elementsResult, `Erro: ${error.message}`);
+    }
+});
+
+arcanaForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const action = event.submitter.getAttribute('data-action');
+    const formData = new FormData(arcanaForm);
+
+    try {
+        const arcanaId = parseInt(formData.get('id_arcano').trim());
+
+        if(action === 'search') {
+            const result = await getSpecificArcana(arcanaId);
+            showResult(arcanasResult, `Arcana encontrado: ${result.nome} (ID: ${result.id})\n\n${result.descricao}`);
+        } else if (action === 'list') {
+            const result = await getAllArcanas();
+            let resultString = 'Lista de Arcanas:\n';
+
+            result.forEach((arcana) => {
+                resultString += `- ${arcana.nome} (ID: ${arcana.id})\n`;
+            });
+
+            showResult(arcanasResult, resultString);
+        } else if (action === 'verify-options') {
+            const result = await verifyArcanasOptions();
+            showResult(arcanasResult, result)
+        } else if (action === 'verify') {
+            if (arcanaId || arcanaId === 0) {
+                const result = await verifySpecificArcana(arcanaId);
+                showResult(arcanasResult, `Verificação de Arcana ID ${arcanaId}: ${result}`);
+            } else {
+                const result = await verifyArcanas();
+                showResult(arcanasResult, `Verificação de Arcanas: ${result}`);
+            }
+        }
+    } catch (error) {
+        showResult(arcanasResult, `Erro: ${error.message}`);
+    }
+});

@@ -21,7 +21,6 @@
 
 :root {
     --red: #E60012;
-    --red-dark: #A8000D;
     --red-light: #FF2638;
 
     --black: #0D0D0F;
@@ -32,23 +31,16 @@
 
     --gold: #D6A928;
     --gold-light: #F2D46F;
-    --gold-dark: #96751A;
-    --yellow: #FDF4CB;
-
-    --gray: #777777;
-    --gray-dark: #303035;
 
     --special-font: Persona5-Menu;
     --common-font: Optima-Nova-LT-Black;
     --bold-font: p5hatty;
 
-    --font-sm: 1.25rem;
     --sizing-sm: 1rem;
     --sizing-md: 1.5rem;
     --sizing-lg: 2rem;
     --sizing-xl: 3rem;
     --sizing-xxl: 4rem;
-    --sizing-xxxl: 5rem;
 }
 
 html {
@@ -61,6 +53,10 @@ body {
 
 section {
     height: 100vh;
+}
+
+h1 {
+    font-weight: normal;
 }
 
 header {
@@ -81,7 +77,6 @@ header {
 
 header h1 {
     font-size: var(--sizing-xl);
-    font-weight: normal;
     transition: .4s;
 }
 
@@ -124,23 +119,23 @@ header a:hover {
 }
 
 input, button {
-        height: 35px;
-        width: 350px;
-        text-align: center;
-        font-family: var(--common-font);
-        font-size: 1rem;
-    }
+    height: 35px;
+    width: 350px;
+    text-align: center;
+    font-family: var(--common-font);
+    font-size: 1rem;
+}
 
-    button {
-        background-color: var(--red-light);
-        border-radius: 5px;
-        transition: .4s;
+button {
+    background-color: var(--red-light);
+    border-radius: 5px;
+    transition: .4s;
 
-        &:hover {
-            background-color: var(--red);
-            scale: 1.02;
-        }
+    &:hover {
+        background-color: var(--red);
+        scale: 1.02;
     }
+}
 
 #Personas {
     display: grid;
@@ -159,11 +154,12 @@ input, button {
     .form-persona {
         display: flex;
         flex-direction: column;
+        align-items: center;
         gap: var(--sizing-lg);
         padding: var(--sizing-md);
         background-color: var(--black-soft);
         border-radius: 10px;
-        border: 4px solid var(--yellow);
+        border: 4px solid var(--white-muted);
     }
 
     .cadaster-persona {
@@ -218,12 +214,15 @@ input, button {
 #Elementos {
     display: grid;
     grid-template-columns: 1fr;
-    background-image: url(../images/elementos.jpeg);
+    background-image: url(../images/elementos_transparente.png);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     align-items: center;
     gap: var(--sizing-sm);
+
+    border-top: 4px solid var(--gold-light);
+    border-bottom: 4px solid var(--gold-light);
 
     h1 {
         font-family: var(--special-font);
@@ -242,7 +241,7 @@ input, button {
         margin-inline: var(--sizing-lg);
         margin-top: var(--sizing-xl);
         border-radius: 10px;
-        border: 4px solid var(--yellow);
+        border: 4px solid var(--white-muted);
 
         form {
             display: grid;
@@ -267,7 +266,7 @@ input, button {
 #Arcanas {
     display: grid;
     grid-template-columns: 1fr;
-    background-image: url(../images/arcano.jpg);
+    background-image: url(../images/arcano_transparente.png);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -291,7 +290,7 @@ input, button {
         margin-inline: var(--sizing-lg);
         margin-top: var(--sizing-xl);
         border-radius: 10px;
-        border: 4px solid var(--yellow);
+        border: 4px solid var(--white-muted);
 
         form {
             display: grid;
@@ -311,4 +310,21 @@ input, button {
         object-fit: cover;
         height: 250px;
     }
+}
+
+.column-2 {
+    grid-column: span 2;
+}
+
+.result {
+    color: var(--white);
+    font-family: var(--common-font);
+    font-size: 1.1rem;
+
+    padding: var(--sizing-lg) var(--sizing-xxl);
+    text-align: left;
+    white-space: pre-line;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
 }
