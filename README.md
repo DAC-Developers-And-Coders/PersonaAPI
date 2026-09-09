@@ -1,28 +1,46 @@
-# API de Usuários
+# API de Personas em Python + HTML/CSS/JS Front-End
 
-API simples em Python com FastAPI, sem orientação a objetos e sem banco de dados.
-Os dados são representados por dicionários/listas e persistidos em `usuarios.json`.
+API em Python com FastAPI, com orientação a objetos, banco de dados e front-end.
 
 ## Estrutura
 
 ```text
-api_usuarios/
-├── main.py
-├── controller.py
-├── service.py
-├── usuarios.json
-├── requirements.txt
+├── api-backend/
+|   ├── Model/
+|   |    ├── Arcana.py
+|   |    ├── Database.py
+|   |    ├── Elemento.py
+|   |    └── Persona.py
+|   ├── Routers/
+|   |    ├── arcanas.py
+|   |    ├── elementos.py
+|   |    └── personas.py
+|   ├── Utils/
+|   |    └── default_values.py
+|   ├── main.py
+|   ├── controller.py
+|   ├── service.py
+|   ├── requirements.txt
+|   └── personadb.db
+├── front-end/
+|   ├── fonts/
+|   ├── images/
+|   ├── script/
+|   |    └── script.js
+|   ├── style/
+|   |    └── style.css
+|   └── index.html
 └── README.md
 ```
 
-O `main.py` cria a aplicação e registra o `router` do controller.
-O `controller.py` concentra as rotas HTTP.
-O `service.py` contém a lógica e a persistência no arquivo JSON.
-
-## Instalação
+## Instalação da API - na pasta api-backend
 
 ```bash
 python -m venv .venv
+```
+#### OU
+```bash
+py -m venv .venv
 ```
 
 Windows:
@@ -49,6 +67,12 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
+Front-End:
+
+```text
+http://localhost:8000/docs
+```
+
 API:
 
 ```text
@@ -61,38 +85,94 @@ Swagger:
 http://localhost:8000/docs
 ```
 
-## Endpoints
+## Endpoints - PERSONAS
 
-### POST `/usuarios`
-
-```json
-{
-  "nome": "João Silva",
-  "email": "joao@email.com",
-  "idade": 30
-}
-```
-
-### GET `/usuarios`
-
-Lista todos os usuários.
-
-### GET `/usuarios/{id}`
-
-Busca um usuário pelo ID.
-
-### PUT `/usuarios/{id}`
-
-Atualiza os dados do usuário.
+### POST `/personas`
 
 ```json
 {
-  "nome": "João Santos",
-  "email": "joao.santos@email.com",
-  "idade": 31
+  "nome": "string",
+  "origem": "string",
+  "primeira_aparicao": "string",
+  "classe": "string",
+  "nivel_inicial": 0,
+  "arcana_id": 0,
+  "elemento_id": 0
 }
 ```
 
-### DELETE `/usuarios/{id}`
+### GET `/personas`
 
-Exclui o usuário pelo ID.
+Lista todas as personas.
+
+### GET `/personas/{id}`
+
+Busca uma persona pelo ID.
+
+### PUT `/personas/{id}`
+
+Atualiza os dados da persona.
+
+### DELETE `/personas/{id}`
+
+Deleta os dados da persona.
+
+### PATCH `/personas/{id}/{attribute}`
+
+Atualiza um atributo da persona.
+
+### HEAD `/personas`
+
+Verifica se existem personas.
+
+### HEAD `/personas/{id}`
+
+Verifica se uma persona existe.
+
+### OPTIONS `/personas`
+
+Verifica as opções de request HTML disponíveis.
+
+## Endpoints - ELEMENTOS
+
+### GET `/elementos`
+
+Lista todos os elementos.
+
+### GET `/elementos/{id}`
+
+Busca um elemento pelo ID (1 - 11).
+
+### HEAD `/elementos`
+
+Verifica se existem elementos.
+
+### HEAD `/elementos/{id}`
+
+Verifica se um elemento existe.
+
+### OPTIONS `/elementos`
+
+Verifica as opções de request HTML disponíveis.
+
+## Endpoints - ARCANAS
+
+### GET `/arcanas`
+
+Lista todas as arcanas.
+
+### GET `/arcanas/{id}`
+
+Busca uma arcana pelo ID (0 - 21).
+
+### HEAD `/arcanas`
+
+Verifica se existem arcanas.
+
+### HEAD `/arcanas/{id}`
+
+Verifica se uma arcana existe.
+
+### OPTIONS `/arcanas`
+
+Verifica as opções de request HTML disponíveis.
