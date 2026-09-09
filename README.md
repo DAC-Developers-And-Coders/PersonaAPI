@@ -69,9 +69,7 @@ uvicorn main:app --reload
 
 Front-End:
 
-```text
 [https://dac-developers-and-coders.github.io/PersonaAPI/](https://dac-developers-and-coders.github.io/PersonaAPI/)
-```
 
 API:
 
