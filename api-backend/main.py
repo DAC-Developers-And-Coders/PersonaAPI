@@ -22,6 +22,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Allow", "mensagem"]
 )
 
 app.include_router(pr)
