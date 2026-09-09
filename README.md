@@ -70,7 +70,7 @@ uvicorn main:app --reload
 Front-End:
 
 ```text
-http://localhost:8000/docs
+[https://dac-developers-and-coders.github.io/PersonaAPI/](https://dac-developers-and-coders.github.io/PersonaAPI/)
 ```
 
 API:
