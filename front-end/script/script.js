@@ -229,12 +229,20 @@ createPersonaForm.addEventListener('submit', async (event) => {
         } else if (action === 'update') {
             const personaId = parseInt(formData.get('id').trim());
 
+            if(!personaId) {
+                throw new Error('ID é obrigatório para atualizar persona.');
+            }
+
             const updatedPersona = createPersona(personaName, personaOrigin, firstAppearance, personaClass, initialLevel, arcana_id, element_id);
 
             const result = await updatePersona(personaId, updatedPersona);
             showResult(personaResult, `Persona ${result.nome} atualizada com sucesso! ID: ${result.id}`);
         } else if (action === 'update-patch') {
             const personaId = parseInt(formData.get('id').trim());
+
+            if(!personaId) {
+                throw new Error('ID é obrigatório para atualizar persona.');
+            }
 
             const fields = {
                 nome: formData.get('name').trim(),
@@ -256,7 +264,7 @@ createPersonaForm.addEventListener('submit', async (event) => {
                         convertedValue = Number(value);
                     }
 
-                    const result = await updatePersonaAttribute(personaId, attribute, convertedValue.trim());
+                    const result = await updatePersonaAttribute(personaId, attribute, convertedValue);
                 }
             }
 
@@ -384,7 +392,7 @@ arcanaForm.addEventListener('submit', async (event) => {
 
         if(action === 'search') {
             const result = await getSpecificArcana(arcanaId);
-            showResult(arcanasResult, `Arcana encontrado: ${result.nome} (ID: ${result.id})\n\n${result.descricao}`);
+            showResult(arcanasResult, `Arcana encontrada: ${result.nome} (ID: ${result.id})\n\n${result.descricao}`);
         } else if (action === 'list') {
             const result = await getAllArcanas();
             let resultString = 'Lista de Arcanas:\n';
