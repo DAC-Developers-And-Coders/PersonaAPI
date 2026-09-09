@@ -24,13 +24,13 @@
             <div class="cadaster-persona">
                 <h1>Cadastro de Persona</h1>
                 <form id="create-persona-form">
-                    <input type="number" name="id" placeholder="ID (Apenas para atualizar)">
+                    <input type="number" name="id" min="1" placeholder="ID (Apenas para atualizar)">
                     <input type="text" name="name" placeholder="Nome do Persona">
                     <input type="text" name="origem" placeholder="Origem do Persona">
                     <input type="text" name="primeira_aparicao" placeholder="Primeira Aparição do Persona">
                     <input type="text" name="classe" placeholder="Classe do Persona (Opcional)">
                     <input type="number" name="nivel_inicial" min="1" placeholder="Nível Inicial do Persona">
-                    <input type="number" name="arcana_id" min="0" step="1" placeholder="ID Arcana do Persona">
+                    <input type="number" name="arcana_id" min="0" placeholder="ID Arcana do Persona">
                     <input type="number" name="elemento_id" min="1" placeholder="ID Elemento do Persona">
 
                     <button type="submit" data-action="create">Cadastrar Persona</button>
