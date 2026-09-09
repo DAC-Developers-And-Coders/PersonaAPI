@@ -25,8 +25,8 @@ def verificar_personas():
     resultado = ctrl.verificar_tabelas('Persona')
 
     if not resultado:
-        raise HTTPException(status_code=404, headers={"mensagem": "nenhuma persona encontrada"})
-    return Response(status_code=200, headers={"mensagem": "personas encontradas"})
+        raise HTTPException(status_code=404, headers={"mensagem": "Nenhuma persona encontrada"})
+    return Response(status_code=200, headers={"mensagem": "Personas encontradas"})
 
 @router.options("")
 def verificar_opcoes():
@@ -35,8 +35,8 @@ def verificar_opcoes():
 @router.head("/{persona_id}")
 def verificar_persona_especifica(persona_id: int):
     if not ctrl.verificar_dado_especifico('Persona', persona_id):
-        raise HTTPException(status_code=404, headers={"mensagem": "persona não encontrada"})
-    return Response(status_code=200, headers={"mensagem": "persona encontrada"})
+        raise HTTPException(status_code=404, headers={"mensagem": "Persona não encontrada"})
+    return Response(status_code=200, headers={"mensagem": "Persona encontrada"})
 
 @router.get("/{persona_id}", response_model=PersonaGet)
 def buscar_persona(persona_id: int):
